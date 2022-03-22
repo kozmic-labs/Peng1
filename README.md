@@ -189,7 +189,19 @@ For the specific usage, please refer to the SDK project `sample.cpp`. I compiled
 
 For the specific implementation details of the SDK, you can read the source code, and I will update the description later when I have time.
 
-## Some questions have been answered in Issues. Before asking questions, please read open/closed Issues.
+#### Related links:
+
+* Peng's Github source: https://github.com/peng-zhihui/ElectronBot
+
+* Peng's Youtube channel: https://www.youtube.com/channel/UCBAdGeil51Iw4y29Sh9Y7hA/videos
+
+* Intro video: https://www.youtube.com/watch?v=FmKTiH5Lca4
+
+* Hackaday article: https://hackaday.com/2022/03/20/__trashed-6/  ** "ELECTRONBOT: A SWEET MINI DESKTOP ROBOT THAT TICKS ALL THE BOXES" **
+
+* HackerNews: https://news.ycombinator.com/item?id=30751112
+
+#### Some questions have been answered in Issues. Before asking questions, please read open/closed Issues.
 
 > Thanks to the following projects:
 >
