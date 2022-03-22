@@ -1,192 +1,197 @@
 # ElectronBot: Mini Desktop Robot
-> 本项目是一个桌面级小机器工具人，外观设计的灵感来源是WALL-E里面的EVE~机器人具备USB通信显示画面功能，具备6个自由度（手部roll、pitch，颈部，腰部各一个），使用自己修改的特制舵机支持关节角度回传。
->
-> 本项目提供了配套的全套开发资料和对应SDK以供二次开发，SDK使用说明见后文。
 
+This project is a desktop-level small robot tool. The inspiration for the appearance design is the EVE~ robot in WALL-E, which has the function of USB communication and display screen, and has 6 degrees of freedom (one for roll, pitch, neck, and waist for each hand). ), use the special servo modified by yourself to support the return of joint angle.
 
+This project provides a complete set of development materials and corresponding SDK for secondary development. Please refer to the following for SDK usage instructions.。
 
-**注意：Issues里面是讨论项目开发相关话题的，不要在里面发无意义的消息，不然watch了仓库的人都会收到通知邮件会给别人造成困扰的！！！灌水可以在仓库的Discuss里讨论！**
+** Note: Issues discuss topics related to project development, don't send meaningless messages in it, otherwise people who watch the warehouse will receive notification emails, which will cause trouble to others! ! ! Irrigation can be discussed in Discuss in the warehouse! **
 
 ![](/5.Docs/Images/robot1.jpg)
 
 ---
 
-### 1.项目文件说明 
+### 1. Project file description 
 
 #### 1.1 Hardware
 
-Hardware文件夹内是ElectronBot里面用到的所有电路的原理图和PCB文件，提供Altium Designer格式的源文件以及Gerber格式的光绘文件用于提供给厂家进行直接加工。
+In the Hardware folder are the schematic diagrams and PCB files of all circuits used in ElectronBot. Source files in Altium Designer format and light drawing files in Gerber format are provided for direct processing by manufacturers.
 
-一共有如下几块板子：
+There are a total of the following boards:
 
-* **ElectronBot**：头部的主控板，包含主控MCUSTM32F405RGT6，圆形屏幕GC9A01，USB-HS的PHY芯片USB3300，以及SD卡。
-* **SensorBoard**：肚子里的传感器板子，包含一个手势传感器，一个USB-HUB芯片，5个I2C舵机的接口，一个MPU6050加速度计&陀螺仪等（USB摄像头也是连接到这个板子的）。
+* **ElectronBot**：The main control board of the head, including the main control MCUSTM32F405RGT6, the circular screen GC9A01, the USB-HS PHY chip USB3300, and the SD card.
 
-* **BaseConnector**：底座上的USB Type-C插座，通过8-Pin的FFC排线和SensorBoard连接，因为机器人本体需要旋转所以使用了柔性排线。
-* **ServoDrive**：用于魔改舵机替换舵机驱动板的电路，通过I2C总线接口和SensorBoard以及头部主控连接。
 
-* **ServoDrive-DK**：同上，但是把PCB的触点接口换成了接插件，方便调试，调试完了下载代码到上面的板子（因为体积太小所以上面的板子没有下载口接插件，所以不方便调试，这里单独提供一个DK版本）。
+* **SensorBoard**：The sensor board in the stomach, including a gesture sensor, a USB-HUB chip, 5 I2C servo interfaces, an MPU6050 accelerometer & gyroscope, etc. (the USB camera is also connected to this board).
+
+* **BaseConnector**：The USB Type-C socket on the base is connected to the SensorBoard through an 8-Pin FFC cable. Because the robot body needs to be rotated, a flexible cable is used.
+
+
+* **ServoDrive**：The circuit used to change the servo to replace the servo driver board. It is connected to the SensorBoard and the head master through the I2C bus interface.
+
+* **ServoDrive-DK**：Same as above, but the contact interface of the PCB is replaced with a connector, which is convenient for debugging. After debugging, download the code to the above board (because the size is too small, the above board does not have a download port connector, so it is inconvenient to debug, A DK version is provided separately here).
 
 #### 1.2 Firmware
 
-Firmware中提供了上面所有板子的固件源码，主要包含以下两个工程：
+Firmware provides the firmware source code of all the above boards, mainly including the following two projects:
 
-* **ElectronBot-fw**：头部主控板的固件代码，用于驱动圆形屏幕，实现USB-CDC协议的自定义设备，以及进行舵机控制。
-* **ElectronBot-fw**：ServoDrive板子的固件，包含舵机的电位器ADC采样，I2C从机通信和协议解析，电机控制的PWM输出，以及PID闭环算法实现。
+* **ElectronBot-fw**：The firmware code of the main control board of the head, used to drive the circular screen, implement the custom device of the USB-CDC protocol, and control the servo.
+* **ElectronBot-fw**：Firmware of ServoDrive board, including potentiometer ADC sampling of servo, I2C slave communication and protocol analysis, PWM output of motor control, and PID closed-loop algorithm implementation.
 
-工程都是基于STM32HAL实现的，所以提供了对应的`.ioc`文件，可以自行用STM32CubeMX打开，生成对应的keil或者STM32IDE工程文件。当让也可以像我一样，用CLion进行编译和下载，把CLion变成STM32的IDE的方法参考我之前发的一篇教程：[配置CLion用于STM32开发【优雅の嵌入式开发】](https://zhuanlan.zhihu.com/p/145801160) 。
+The projects are all implemented based on STM32HAL, so the corresponding .iocfiles are provided, which can be opened with STM32CubeMX to generate the corresponding keil or STM32IDE project files. When you can also compile and download with CLion like me, and turn CLion into an IDE for STM32, please refer to a tutorial I posted before: [Configuring CLion for STM32 Development [Elegant Embedded Development]](https://zhuanlan.zhihu.com/p/145801160) 。
 
 #### 1.3 Software
 
-Software中提供了视频里演示的上位机软件ElectronStudio的Unity工程源码，以及SDK库和SDK源文件，库的层级关系由下至上分别是：
+The software provides the Unity project source code of the host computer software ElectronStudio demonstrated in the video, as well as the SDK library and SDK source files. The hierarchical relationship of the library from bottom to top is:
 
 `ElectronBotSDK-LowLevel` -> `ElectronBotSDK-Player` -> `ElectronBotSDK-UnityBridge` -> `Electron-Studio`
 
-> SDK的使用方法见后文。
+> See below for how to use the SDK.
 
-此外文件夹里还包含了BotDriver也就是ElectronBot连接电脑需要安装的USB驱动文件，安装方法是在设备管理器里右键更新驱动，然后选择自定义目录导航到这个文件夹即可安装。
+In addition, the folder also contains BotDriver, which is the USB driver file that ElectronBot needs to install to connect to the computer. The installation method is to right-click in the device manager to update the driver, and then select the custom directory to navigate to this folder to install.
 
-> 安装过程需要禁用Windows的强制驱动签名（没钱给M$买签名），禁用方法根据你的操作系统版本有不同，可以百度一下。
+> The installation process needs to disable the mandatory driver signature of Windows (no money to buy a signature for M$). The method of disabling is different according to your operating system version, you can Baidu.
 
 #### 1.4 CAD-Model
 
-文件夹中包含了ElectronBot的结构设计图纸，`.step`通用格式可以在所有软件里打开编辑；同时为了满足有的同学想要Fusion360里面的原始工程，我也共享了`.f3d`格式源文件，源文件里包含了完整的编辑建模时间轴。
+The folder contains the structural design drawings of ElectronBot, and the `.step` general format can be opened and edited in all software; at the same time, in order to satisfy some students who want the original project in Fusion360, I also shared the `.f3d` format source file, and the source file contains the complete Edit the modeling timeline.
 
-共享连接：https://a360.co/3t6CUMS
+Shared Connection:https://a360.co/3t6CUMS
 
-此目录下也包含了视频里演示的[oooooohmygosh](https://space.bilibili.com/38053181)同学设计的表情包动画，其中每个表情的动画都包含了三个片段：`进入-循环-退出`，进入和退出是可以和其他动画进行无缝衔接的，因此可以方便用代码调用这些表情包实现很多效果。
+This directory also contains the emoji animations designed by students [oooooohmygosh](https://space.bilibili.com/38053181) demonstrated in the video. Each emoji animation contains three segments: `进入-循环-退出`, the entry and exit can be seamlessly connected with other animations, so it is convenient to use The code calls these emoticons to achieve many effects.
 
-> 表情文件需要修改为英文名和路径后使用。
+> The emoji file needs to be modified to English name and path before use.
 
-我把视频结尾提到的收纳盒也上传了，可以用FDM打印，5%填充即可。
+I also uploaded the storage box mentioned at the end of the video, which can be printed with FDM and filled with 5%.
 
 ![](5.Docs/Images/robot8.jpg)
 
 #### 1.5 Docs
 
-相关的参考文件，包括芯片的Datasheet等。
+Relevant reference documents, including the chip's Datasheet, etc.
 
-此目录下还有个_LargeFiles文件夹，是软件过程项目中依赖的一些库（比如OpenCV）因为DLL比较大超过了100MB，GitHub需要开启LFS才能提交，而我不想开启LFS，因此单独拿出来压缩了提交到仓库，编译工程的时候需要把这些库放到对应工程目录下，具体的路径见 `_path.txt`。
+There is also a `_LargeFiles` folder in this directory, which is some libraries (such as OpenCV) that the software process project depends on. Because the DLL is larger than 100MB, GitHub needs to open LFS to submit, and I don't want to open LFS, so I take it out and compress it separately In order to submit to the warehouse, you need to put these libraries in the corresponding project directory when compiling the project, see the specific path `_path.txt`。
 
-### 2.硬件架构说明
+### 2. Hardware Architecture Description
 
-机器人的硬件分为**结构**和**电路**。
+The hardware of the robot is divided into **tructure** and **circuit**.
 
-#### 2.1 结构设计
+#### 2.1 Structural Design
 
-结构设计方面大家可以研究3D图纸，值得注意的点如下：
+In terms of structural design, you can study 3D drawings. The points worth noting are as follows:
 
-**主要部件的加工方式？**
+** How are the main components processed? **
 
-* 我是用3D打印加工的，因为包含了齿轮等精密部件，传统FDM打印的精度可能不太理想，光固化是可以的，但是支撑问题可能导致打印机表面不平整，而且LCD光固化的零件强度不太够。所以推荐使用HP尼龙打印，可以去嘉立创（三维猴）打印，价格这几个零件加起来应该是200-300元左右。
-* 也用到了几个轴承和一些特殊的螺丝，轴承型号的话肩膀关节的型号是`6x10x3mm`，腰部轴承型号是`25x32x4mm`。特殊螺丝是肩膀roll自由度的推杆，使用了`M2x25mm`的半牙螺丝。
+* I made it with 3D printing, because it contains precision parts such as gears, the accuracy of traditional FDM printing may not be ideal, light curing is possible, but the support problem may cause the surface of the printer to be uneven, and the strength of LCD light-cured parts is not good Enough. Therefore, it is recommended to use HP nylon printing, you can go to Jia Li Chuang (3D Monkey) to print, the price of these parts should add up to about 200-300 yuan.
 
-* 手臂推杆还用到了一个小挡块，这个挡块不用打印加工，直接用一段橡胶电线剪下一小段即可（视频里有演示），这个挡块是需要和推杆的螺丝固定到一起的，可以使用502粘合。
+* Several bearings and some special screws are also used. If the bearing model is the shoulder joint model `6x10x3mm`, the waist bearing model is `25x32x4mm`. The special screw is the push rod of the shoulder roll degree of freedom, and `M2x25mm` the half-thread screw used.
 
-**手臂的驱动原理？**
+* The arm push rod also uses a small block. This block does not need to be printed. Just cut a small section with a piece of rubber wire (there is a demonstration in the video). This block needs to be fixed with the screw of the push rod. , 502 bonding can be used.
 
-* 视频里其实演示了，我自己设计了一个比较巧妙的驱动方式，pitch方向运动很好理解就是齿轮传动，roll方向使用了T型推杆如下：
+** The driving principle of the arm? **
+
+* The video actually demonstrates that I have designed a more ingenious driving method. The pitch direction movement is well understood as gear transmission, and the roll direction uses a T-shaped push rod as follows:
 
   ![](/5.Docs/Images/robot2.jpg)
 
-* 推杆被M2螺丝的帽以及一个挡块限制住，当黄色的组件转动的时候，带动推杆左右移动，而推杆的另一端在手臂组件内由一个导槽限制运动方向从而将动力传递到转轴，此方案的力矩是可以双向传递的
+* The push rod is restricted by the cap of the M2 screw and a stopper. When the yellow component rotates, it drives the push rod to move left and right, and the other end of the push rod is limited by a guide groove in the arm assembly to transmit the power to the arm assembly. Rotating shaft, the torque of this scheme can be transmitted in both directions
 
   ![](/5.Docs/Images/robot3.jpg)
 
-**脸部的透明玻璃如何制作的**
+** How the transparent glass for the face is made **
 
-* tb搜索`表蒙子`，我用的`31.5mm`直径的。
+* tb search `表蒙子`, I use the `31.5mm` diameter.
 
   ![](5.Docs/Images/robot6.jpg)
 
-**安装顺序？**
+** Installation order? **
 
-* 额...这个不太好说明，期待有同学复现了之后录个视频吧！
-* 安装过程中还有一点值得注意的是，因为机身体积太极限，几个舵机的安装架有的是需要剪短一边的不然塞不下，然后如果自己的打印机比较脆螺丝固定不牢的话，也可以使用热熔胶固定。
+* Eh... This is not very easy to explain, I look forward to recording a video after a classmate reproduces it!
 
-#### 2.2 电路设计
+* Another thing worth noting during the installation process is that because the size of the fuselage is too limited, some of the mounting brackets of several servos need to be cut short, otherwise they cannot be plugged. Secure with hot glue.
 
-电路没啥好分析的，直接看原理图吧。
+#### 2.2 Circuit Design
 
-值得提一下的是USB-HUB的拓扑，如下：
+There is nothing to analyze the circuit, just look at the schematic diagram.
+
+It is worth mentioning that the topology of the USB-HUB is as follows:
 
 ![](/5.Docs/Images/robot4.jpg)
 
-**关于芯片选型？**
+** About chip selection? **
 
-* 主控的STM32F4，这个不可替换，因为F4以下的型号不支持USB-HS外接PHY。
-* 舵机驱动的STM32F0，这个可以替换，而且建议有能力的同学替换，因为我项目中用到的STM32F042P6芯片比较贵（买的十多元一片），而舵机驱动对于芯片的性能要求没那么高，完全可以用STM8之类的8位MCU替代，所以大家可以参考我的固件源码寻求能够替换的MCU改进一下方案。
-* 替换STM32F0的MCU需要支持以下特性：带一个ADC采样、带两路PWM输出、带一个I2C接口，Flash和SRAM大小根据我的代码需要32K和4K或者更大（我固件用了HAL库以及C++特性，如果你可以基于LL库或者不适用C++的话应该需求还可以小一半）。
+* The master STM32F4, this is irreplaceable, because models below F4 do not support USB-HS external PHY.
 
-**关于烧录方式？**
+* The STM32F0 driven by the steering gear can be replaced, and it is recommended that capable students replace it, because the STM32F042P6 chip used in my project is relatively expensive (bought a piece of more than ten yuan), and the performance requirements of the steering gear driver are not so high. , it can be completely replaced by 8-bit MCU such as STM8, so you can refer to my firmware source code to find a replacement MCU to improve the solution.
 
-* 使用JLink、STLink之类的调试器烧录，注意驱动板因为体积限制只留了三个烧录触点，需要使用`SH1.0`的接插件接触进行烧写。
+* The MCU that replaces the STM32F0 needs to support the following features: with an ADC sampling, with two PWM outputs, with an I2C interface, the Flash and SRAM size needs to be 32K and 4K or larger according to my code (my firmware uses the HAL library and C++ features , if you can be based on the LL library or don't apply C++, the requirements should be half as small).
 
-**关于舵机的改造？**
+** About the burning method? **
 
-* 通常的RC-Servo都是使用电位器进行绝对角度的测量的，因此我在驱动板中也是使用ADC读取电位器的电压值转换成角度反馈，而驱动芯片使用了我找到的封装最小的一个芯片`FM116B`。大家改造舵机的时候，注意区分电机两根接线的方向，如果调试发现电机不闭环的话，可能需要交换一下接线顺序。
+* Use debuggers such as JLink and STLink for programming. Note that only three programming contacts are left on the driver board due to volume limitations, and `SH1.0` the connectors that need to be used are contacted for programming.
 
-* 另外那个小的3g舵机的改造需要把盖子拆开去掉（空间实在是太小加了盖子驱动塞不进去），然后去掉了后盖的舵机需要换成M1x10mm的螺丝进行固定不然会散架的。
+** About the transformation of the steering gear? **
 
-  > 其实最理想的情况是找舵机厂家定制一个这样的迷你舵机，但是因为我一个人小批量做人家肯定不接单的，大家有渠道的话可以尝试一下。
+* The usual RC-Servo uses a potentiometer to measure the absolute angle, so I also use the ADC to read the voltage value of the potentiometer in the driver board and convert it into angle feedback, and the driver chip uses the smallest package I found. chip `FM116B`. When you modify the steering gear, pay attention to distinguish the direction of the two wires of the motor. If it is found that the motor is not closed-loop during debugging, you may need to exchange the wiring sequence.
 
-**关于摄像头选型？**
+* In addition, the transformation of the small 3g servo needs to disassemble and remove the cover (the space is too small to add the cover driver to plug in), and then the servo with the rear cover removed needs to be replaced with M1x10mm screws for fixing, otherwise it will fall apart.
 
-* 我是用的是这款：https://item.taobao.com/item.htm?id=567717780577
+  > In fact, the ideal situation is to find a steering gear manufacturer to customize a mini steering gear like this, but because I am doing a small batch by myself, I will definitely not accept orders. If you have channels, you can try it.
+
+** About camera selection? **
+
+* I use this one: https://item.taobao.com/item.htm?id=567717780577
 
   ![](/5.Docs/Images/robot5.jpg)
 
-* 当然大家可以根据需要自己替换别的USB摄像头（黑白的、高帧率的），只要塞得下就行，摄像头是直接拆了接线焊在SensorBoard上的 。
+* Of course, you can replace other USB cameras (black and white, high frame rate) according to your needs, as long as it can be plugged in, the camera is directly disconnected and soldered on the SensorBoard.
 
-  > 值得注意的是，**我用的USB-HUB芯片的1拖4的**，目前使用了三个口，还剩一个其实可以再集成一个USB麦克风，这样ElectronBot也能当作电脑的麦克风使用了。 
+  > It is worth noting that the 1-to-4 USB-HUB chip I used currently uses three ports, and the remaining one can actually integrate a USB microphone, so that ElectronBot can also be used as a computer microphone.
 
-### 3.软件架构说明
+### 3. Software Architecture Description
 
-#### 3.1 固件代码
+#### 3.1 Firmware code
 
-固件代码的细节和流程说明比较繁琐，晚点我慢慢补充吧，总之可以直接基于前面提到的方式进行编译下载，然后慢慢研究源码。
+The details and process descriptions of the firmware code are relatively cumbersome. I will add them later. In short, you can compile and download directly based on the method mentioned above, and then slowly study the source code.
 
-> STM32F4的源码如果通过`.ioc`重新生成工程的话，记得要把USB相关的几个文件预先备份，生成完代码后再替换回我原来的文件，因为CubeMX会覆盖生成把相关代码修改掉（我实际是使用Git的文件版本回退操作的 ）。
+> If the source code of STM32F4 is regenerated by `.ioc` regenerating the project, remember to back up several files related to USB in advance, and then replace the original files after generating the code, because CubeMX will overwrite the generation and modify the relevant code (I actually use Git file version rollback operation).
 
-#### 3.2 舵机I2C协议
+#### 3.2 Servo I2C Protocol
 
-魔改后的舵机通过I2C接口和控制板进行通信，STM32F4的控制板为主机，舵机为从机。通信的过程始终是主机发起的，主机首先下发位置、参数等指令，然后即时取回相关数据完成一个通信来回。
+The modified steering gear communicates with the control board through the I2C interface. The control board of the STM32F4 is the master and the steering gear is the slave. The communication process is always initiated by the host. The host first issues commands such as location and parameters, and then retrieves the relevant data immediately to complete a round-trip communication.
 
-每个舵机作为从机接收两个地址的指令：**自己的ID号**，以及**0号广播**。广播用于在没有给舵机设置地址的时候作为通配地址使用（比如你刚烧写完舵机固件，此时舵机的Flash是没有储存自己的ID的，只能通过0号地址通信）。
+As a slave, each servo receives commands from two addresses: **its own ID number** , and **broadcast number 0**. Broadcast is used as a wildcard address when no address is set for the servo (for example, if you have just finished programming the firmware of the servo, the Flash of the servo does not store its own ID, and can only communicate through address 0) .
 
-**值得注意的是：舵机和主机的上电需要有先后顺序，一定要先让从机初始化完成开始监听数据，再让主机发送指令！**
+** It is worth noting that the power-on of the servo and the host needs to be in order. Be sure to let the slave machine initialize and start monitoring data, and then let the host send commands! **
 
-> 如果主机发送指令的时候从机不响应，或者多个舵机地址相同同时响应，都可能引起通信错误，因此需要保证上述的顺序。
->
-> 由于硬件上主机和舵机上电都是同时的，所以在主机的固件代码中，有一个延时2S的代码（其实可以不用那么久），就是等待舵机都上电初始化完成再开始通信。
->
-> 调试的时候，一个舵机一个舵机调试，注释掉其他未连接的舵机的通信代码，不然也会造成轮询等待超时。
+> If the slave does not respond when the host sends a command, or if multiple servos with the same address respond at the same time, it may cause a communication error, so the above sequence needs to be guaranteed.
 
-关于舵机的指令含义，感谢 **[leazer](https://github.com/leazer)** 同学在Issues整理的表格：
+> Since the host and the servos are powered on at the same time on the hardware, there is a 2S delay code in the host's firmware code (in fact, it doesn't take that long), which is to wait for the servos to be powered on and the initialization is completed before starting the communication.
+
+> When debugging, debug one servo and one servo, and comment out the communication codes of other unconnected servos, otherwise it will also cause the polling to wait for a timeout.
+
+Regarding the meaning of the command of the steering gear, thanks to the **[leazer](https://github.com/leazer)** classmates for the table organized in Issues:
 
 ![](https://pengzhihui-markdown.oss-cn-shanghai.aliyuncs.com/img/20220322010150.png)
 
-> 指令后续可能会更新。
+> Instructions may be updated in the future.
 
-#### 3.3 SDK使用说明
+#### 3.3 SDK Instructions
 
-SDK架构设计如图：
+The SDK architecture design is shown in the figure:
 
 ![](/5.Docs/Images/robot7.jpg)
 
-具体的使用方法可以参考SDK工程中给出的`sample.cpp`，我是用CLion+MSVC工具链编译的，大家也可以把源码复制到自己的Visual Studio工程编译。
+For the specific usage, please refer to the SDK project `sample.cpp`. I compiled it with the CLion+MSVC toolchain. You can also copy the source code to your own Visual Studio project for compilation.
 
-`ElectronBotSDK-UnityBridge`工程编译生成的DLL文件需要拷贝到`Unity\ElectronBot-Studio\Assets\Plugins`目录下，用于连接本地的C++代码和Unity中C#环境。
+`ElectronBotSDK-UnityBridge`The DLL file generated by the project compilation needs to be copied to the `Unity\ElectronBot-Studio\Assets\Plugins` directory, which is used to connect the local C++ code and the C# environment in Unity.
 
-> **对了，注意ElectronStudio中目前选择图片视频文件还不支持中文路径！**
+> ** By the way, note that the current selection of picture and video files in ElectronStudio does not support Chinese paths! **
 
-关于SDK的具体实现细节可以阅读源码，我晚点有空也会再更新描述。
+For the specific implementation details of the SDK, you can read the source code, and I will update the description later when I have time.
 
-### 有的问题在Issues里面已经解答了，问问题之前先翻一下open/closed的Issues。
+## Some questions have been answered in Issues. Before asking questions, please read open/closed Issues.
 
-
-
-> 感谢以下项目：
+> Thanks to the following projects:
 >
 > [opencv/opencv: Open Source Computer Vision Library (github.com)](https://github.com/opencv/opencv)
 >
